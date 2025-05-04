@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasky-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tasky
+  template:
+    metadata:
+      labels:
+        app: tasky
+    spec:
+      containers:
+      - name: tasky
+        image: gcr.io/clgcporg10-181/tasky:v1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://wills:12345a@34.9.1.140:27017"
+        - name: SECRET_KEY
+          value: "secret123"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasky-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: tasky
+  ports:
+    - port: 80
+      targetPort: 8080
