@@ -6,19 +6,24 @@ provider "google" {
 
 # GKE Cluster
 resource "google_container_cluster" "gke_cluster" {
-  name     = "wiz-iac-cluster"
-  location = "us-central1-a"
-
+  name                    = "wiz-iac-cluster"
+  location                = "us-central1-a"
   remove_default_node_pool = true
+  deletion_protection     = false
+}
 
-  node_pool {
-    name       = "default-pool"
-    node_count = 3
+# GKE Node Pool
+resource "google_container_node_pool" "default_pool" {
+  name       = "default-pool"
+  cluster    = google_container_cluster.gke_cluster.name
+  location   = "us-central1-a"
+  node_count = 3
 
-    node_config {
-      machine_type = "e2-medium"
-      oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    }
+  node_config {
+    machine_type = "e2-medium"
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
   }
 }
 
@@ -35,8 +40,8 @@ resource "google_compute_instance" "mongodb_vm" {
   }
 
   network_interface {
-    network = "default"
-    access_config {}
+    network       = "default"
+    access_config {}  # Assigns external IP
   }
 
   metadata_startup_script = <<-EOT
@@ -49,24 +54,23 @@ resource "google_compute_instance" "mongodb_vm" {
     apt-get install -y mongodb-org
     systemctl start mongod
     systemctl enable mongod
+    sleep 10
     mongo --eval 'db.createUser({user:"wills",pwd:"12345a",roles:[{role:"readWrite",db:"test"}]})'
   EOT
 }
 
-# GCS Bucket for backups
+# Public GCS Bucket for Backups
 resource "google_storage_bucket" "wiz_db" {
-  name     = "wizard-iac-storage"
-  location = "US"
+  name          = "wizard-iac-storage"
+  location      = "US"
   force_destroy = true
-
   uniform_bucket_level_access = true
 }
 
-# Make GCS bucket publicly readable
+# Make GCS Bucket Public (misconfiguration)
 resource "google_storage_bucket_iam_binding" "public_read" {
   bucket = google_storage_bucket.wiz_db.name
 
   role    = "roles/storage.objectViewer"
   members = ["allUsers"]
 }
-
