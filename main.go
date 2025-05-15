@@ -11,6 +11,8 @@ func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", nil)
 }
 
+fmt.Println("📦 Tasky app built from GitHub Actions!")
+
 func main() {
 	godotenv.Overload()
 	
