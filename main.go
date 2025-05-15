@@ -10,13 +10,9 @@ import (
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", nil)
 }
-import (
-    "fmt"
-    "github.com/gin-gonic/gin"
-)
+
 
 func main() {
-	fmt.Println("📦 Tasky app built from GitHub Actions!")
 	godotenv.Overload()
 
 	
