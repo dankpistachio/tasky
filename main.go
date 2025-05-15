@@ -14,10 +14,11 @@ import (
     "fmt"
     "github.com/gin-gonic/gin"
 )
-fmt.Println("📦 Tasky app built from GitHub Actions!")
 
 func main() {
+	fmt.Println("📦 Tasky app built from GitHub Actions!")
 	godotenv.Overload()
+
 	
 	router := gin.Default()
 	router.LoadHTMLGlob("assets/*.html")
