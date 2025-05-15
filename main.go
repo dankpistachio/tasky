@@ -10,7 +10,10 @@ import (
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", nil)
 }
-
+import (
+    "fmt"
+    "github.com/gin-gonic/gin"
+)
 fmt.Println("📦 Tasky app built from GitHub Actions!")
 
 func main() {
